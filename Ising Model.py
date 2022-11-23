@@ -1,9 +1,11 @@
+import matplotlib.pyplot as plt
 import numpy as np
-dim = 10 #int(input())
-S = np.full((dim, dim), 1)
-N = 10
+dim = n = 10 #int(input())
+S = np.random.choice([1, -1],size=(n,n)) # np.full((dim, dim), 1)
+# S = np.full((dim, dim), 1)
+N = 10**5
 K = 1
-T = 100
+T = 2.5
 
 
 def total(S):
@@ -33,7 +35,8 @@ def total(S):
 
     return E_p
 
-total_prob = 0
+total_E = []
+inst_avg_E = []
 dist = 0
 print(S)
 print(total(S))
@@ -48,16 +51,20 @@ for i in range(N):
     prob = np.exp(-delta/(K*T))
     r_p = np.random.rand(1)[0]
     if (r_p < prob) or E_prev>E_next:
-        total_prob += np.exp(-E_next/(K*T))
-        dist += np.exp(-E_next/(K*T))*E_next
+        total_E.append(E_prev)
         E_prev = E_next
-        # print(total_prob)
     else:
         S[r_x][r_y] = -S[r_x][r_y]
     
+total_E.append(E_next)
+avg_E = np.average(total_E)
+iter = range(1, len(total_E)+1)
+avg_E_list = np.cumsum(total_E)/iter
 print("Last ACCEPTED config")
 print(S)
 print(E_prev)
-# E_avg = float(dist/total_prob)
-# print(f"Average Energy = {E_avg}")
 
+print(f"Average Energy = {avg_E}")
+
+plt.plot(iter, avg_E_list)
+plt.show()
