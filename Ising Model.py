@@ -16,29 +16,30 @@ def total(S):
             E_p -= J*S[i, j]*(S[(i+1)%n,j]+S[(i-1)%n,j]+S[i,(j-1)%n]+S[i,(j+1)%n])
 
     return E_p/4
-def change(N, T, S):
+def change(T, S):
     # total_E = []
     # inst_avg_E = []
     # dist = 0
     # print(S)
     # print(total(S))
-
-    for _ in range(N):
-        r_x = np.random.randint(dim)
-        r_y = np.random.randint(dim)
-        E_prev = total(S)
-        S[r_x][r_y] = -S[r_x][r_y]
-        E_next = total(S)
-        delta = E_next-E_prev
-        prob = np.exp(-delta/(K*T))
-        r_p = np.random.rand(1)[0]
-        # print(prob)
-        # print(type(E_next), type(E_prev), type(r_p), type(prob))
-        if (r_p < prob) or (E_prev>E_next):
-            # total_E.append(E_prev)
-            E_prev = E_next
-        else:
-            S[r_x][r_y] = -S[r_x][r_y]
+    for _ in range(n):
+        for _ in range(n):
+            i = np.random.randint(dim)
+            j = np.random.randint(dim)
+            # E_prev = total(S)
+            s = S[i][j]
+            # E_next = total(S)
+            delta = 2*s*(S[(i+1)%n,j]+S[(i-1)%n,j]+S[i,(j-1)%n]+S[i,(j+1)%n])
+            prob = np.exp(-delta/(K*T))
+            r_p = np.random.rand(1)[0]
+            # print(prob)
+            # print(type(E_next), type(E_prev), type(r_p), type(prob))
+            if (r_p < prob) or (delta < 0):
+                S[i][j] = -s
+                # total_E.append(E_prev)
+                # E_prev = E_next
+            # else:
+            #     S[i][j] = -S[i][j]
         
     # total_E.append(E_next)
     # avg_E = np.average(total_E)100*N*N)
@@ -49,18 +50,23 @@ def change(N, T, S):
 # print(S)
 # print(E_prev)
 T = 1
-change(1000, T, S)
-avg_E_list = []
-T = np.linspace(T,T+1,20)
+x = 5000*100
+for _ in range(1000):
+    change(T, S)
+avg_E_list = np.zeros(20)
+T = np.linspace(T,T+2,20)
 
-E = 0
-for t in T:
-    change(5000, t, S)
-    e = total(S)
-    E +=  e
+# E = 0
+for t in range(20):
+    print(t)
+    E = 0
+    for i in range(5000):
+        change(T[t], S)
+        e = total(S)
+        E +=  e
     # print(S)
     # print(e, t)
-    avg_E_list.append(E/(5000*N*N))
+    avg_E_list[t] = E/x
 
 # iter = range(1, len(avg_E_list)+1)
 # a = np.cumsum(avg_E_list)/iter
